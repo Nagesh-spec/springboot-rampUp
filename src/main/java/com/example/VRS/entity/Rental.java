@@ -1,6 +1,8 @@
 package com.example.VRS.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
 import com.example.VRS.enums.RentalStatus;
 import java.time.LocalDate;
 import java.math.BigDecimal;
@@ -12,6 +14,7 @@ public class Rental {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @NotNull
     private Long id;
     
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
