@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 
 import lombok.Data;
 
-/**
- * Standard error response DTO for all error responses
- */
 @Data
 public class ErrorResponse {
     private int statusCode;
