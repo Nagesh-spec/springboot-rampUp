@@ -1,0 +1,14 @@
+package com.example.VRS.exception;
+
+/**
+ * Exception thrown when trying to create a duplicate resource
+ */
+public class DuplicateResourceException extends RuntimeException {
+    public DuplicateResourceException(String message) {
+        super(message);
+    }
+
+    public DuplicateResourceException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}
