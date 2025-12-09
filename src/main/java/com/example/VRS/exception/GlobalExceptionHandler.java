@@ -1,5 +1,6 @@
 package com.example.VRS.exception;
 
+import com.example.VRS.controller.CustomerController;
 import com.example.VRS.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,8 @@ import java.time.LocalDateTime;
  * Global exception handler for the entire application
  * Provides consistent error responses across all endpoints
  */
-@RestControllerAdvice
+
+@RestControllerAdvice(assignableTypes = {CustomerController.class})
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**

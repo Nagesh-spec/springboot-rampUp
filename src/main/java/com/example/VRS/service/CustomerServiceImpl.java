@@ -6,7 +6,13 @@ import com.example.VRS.repository.CustomerRepository;
 import com.example.VRS.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.CallableStatementCallback;
+import oracle.jdbc.OracleTypes;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,6 +22,9 @@ public class CustomerServiceImpl implements CustomerService {
     
     @Autowired
     private CustomerRepository customerRepository;
+    
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public CustomerDto createCustomer(CustomerDto customerDto) {
@@ -39,9 +48,58 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerDto> getAllCustomers() {
-        return customerRepository.findAll().stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        try {
+            // Call stored procedure using JdbcTemplate
+            return getAllCustomersFromProcedure();
+        } catch (Exception e) {
+            System.err.println("Error calling stored procedure: " + e.getMessage());
+            // Fallback to regular JPA if procedure fails
+            return customerRepository.findAll().stream()
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+        }
+    }
+    
+    private List<CustomerDto> getAllCustomersFromProcedure() {
+        return jdbcTemplate.execute(
+            "{ call GET_ALL_CUSTOMERS(?) }",
+            (CallableStatementCallback<List<CustomerDto>>) callableStatement -> {
+                // Register the OUT parameter as REF_CURSOR
+                callableStatement.registerOutParameter(1, OracleTypes.CURSOR);
+                
+                // Execute the procedure
+                callableStatement.execute();
+                
+                // Get the result set from the cursor
+                List<CustomerDto> customers = new ArrayList<>();
+                try (ResultSet rs = (ResultSet) callableStatement.getObject(1)) {
+                    while (rs.next()) {
+                        CustomerDto customerDto = mapResultSetToDto(rs);
+                        customers.add(customerDto);
+                    }
+                }
+                
+                return customers;
+            }
+        );
+    }
+    
+    private CustomerDto mapResultSetToDto(ResultSet rs) throws SQLException {
+        return new CustomerDto(
+            rs.getLong("ID"),
+            rs.getString("FIRST_NAME"),
+            rs.getString("LAST_NAME"),
+            rs.getString("EMAIL"),
+            rs.getString("PHONE_NUMBER"),
+            rs.getString("ADDRESS"),
+            rs.getString("CITY"),
+            rs.getString("STATE"),
+            rs.getString("POSTAL_CODE"),
+            rs.getString("LICENSE_NUMBER"),
+            rs.getDate("LICENSE_EXPIRY") != null ? rs.getDate("LICENSE_EXPIRY").toLocalDate() : null,
+            rs.getDate("DATE_OF_BIRTH") != null ? rs.getDate("DATE_OF_BIRTH").toLocalDate() : null,
+            rs.getDate("REGISTRATION_DATE") != null ? rs.getDate("REGISTRATION_DATE").toLocalDate() : null
+        );
     }
 
     @Override
