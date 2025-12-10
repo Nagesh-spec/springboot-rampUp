@@ -1,6 +1,7 @@
 package com.example.VRS.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,8 +20,9 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
-    
-    @Column(name = "first_name", nullable = false)
+
+    @NotNull
+    @Column(name = "first_name")
     private String firstName;
     
     @Column(name = "last_name", nullable = false)
