@@ -1,0 +1,1 @@
+EXEC VRS.UpdateVehicleStatus(11, 'RENTED');

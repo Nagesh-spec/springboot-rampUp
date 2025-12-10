@@ -2,11 +2,13 @@ package com.example.VRS.controller;
 
 import com.example.VRS.model.RentalDto;
 import com.example.VRS.service.RentalService;
+import com.example.VRS.enums.RentalStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/rentals")
@@ -42,6 +44,16 @@ public class RentalController {
             @PathVariable Long id,
             @RequestBody RentalDto rentalDto) {
         RentalDto updatedRental = rentalService.updateRental(id, rentalDto);
+        return ResponseEntity.ok(updatedRental);
+    }
+    
+    // Update rental status
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<RentalDto> updateRentalStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> statusUpdate) {
+        RentalStatus status = RentalStatus.valueOf(statusUpdate.get("status").toUpperCase());
+        RentalDto updatedRental = rentalService.updateRentalStatus(id, status);
         return ResponseEntity.ok(updatedRental);
     }
     

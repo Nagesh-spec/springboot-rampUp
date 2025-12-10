@@ -98,25 +98,25 @@ public class DataInitializer implements CommandLineRunner {
     
     private void initializeCustomers() {
         // Create customers
-        Customer cust1 = new Customer("John", "Doe", "john.doe@email.com", "555-0001", 
+        Customer cust1 = new Customer(null, "John", "Doe", "john.doe@email.com", "555-0001", 
                 "123 Main St", "New York", "NY", "10001", 
-                "DL001", LocalDate.of(2026, 12, 31), LocalDate.of(1990, 5, 15));
+                "DL001", LocalDate.of(2026, 12, 31), LocalDate.of(1990, 5, 15), null, null);
         
-        Customer cust2 = new Customer("Jane", "Smith", "jane.smith@email.com", "555-0002", 
+        Customer cust2 = new Customer(null, "Jane", "Smith", "jane.smith@email.com", "555-0002", 
                 "456 Oak Ave", "Los Angeles", "CA", "90001", 
-                "DL002", LocalDate.of(2026, 6, 30), LocalDate.of(1985, 3, 20));
+                "DL002", LocalDate.of(2026, 6, 30), LocalDate.of(1985, 3, 20), null, null);
         
-        Customer cust3 = new Customer("Robert", "Johnson", "robert.johnson@email.com", "555-0003", 
+        Customer cust3 = new Customer(null, "Robert", "Johnson", "robert.johnson@email.com", "555-0003", 
                 "789 Pine St", "Chicago", "IL", "60601", 
-                "DL003", LocalDate.of(2025, 9, 15), LocalDate.of(1988, 7, 10));
+                "DL003", LocalDate.of(2025, 9, 15), LocalDate.of(1988, 7, 10), null, null);
         
-        Customer cust4 = new Customer("Maria", "Williams", "maria.williams@email.com", "555-0004", 
+        Customer cust4 = new Customer(null, "Maria", "Williams", "maria.williams@email.com", "555-0004", 
                 "321 Elm St", "Houston", "TX", "77001", 
-                "DL004", LocalDate.of(2026, 3, 22), LocalDate.of(1992, 11, 8));
+                "DL004", LocalDate.of(2026, 3, 22), LocalDate.of(1992, 11, 8), null, null);
         
-        Customer cust5 = new Customer("Michael", "Brown", "michael.brown@email.com", "555-0005", 
+        Customer cust5 = new Customer(null, "Michael", "Brown", "michael.brown@email.com", "555-0005", 
                 "654 Maple Dr", "Phoenix", "AZ", "85001", 
-                "DL005", LocalDate.of(2025, 7, 14), LocalDate.of(1987, 9, 25));
+                "DL005", LocalDate.of(2025, 7, 14), LocalDate.of(1987, 9, 25), null, null);
         
         customerRepository.save(cust1);
         customerRepository.save(cust2);
@@ -135,7 +135,7 @@ public class DataInitializer implements CommandLineRunner {
         if (vehicle1 != null && customer1 != null) {
             LocalDate startDate = LocalDate.now().plusDays(1);
             LocalDate endDate = startDate.plusDays(5);
-            Rental rental1 = new Rental(vehicle1, customer1, startDate, endDate, RentalStatus.PENDING);
+            Rental rental1 = new Rental(null, vehicle1, customer1, startDate, endDate, endDate, RentalStatus.PENDING, null, null, endDate);
             rental1.setTotalCost(new BigDecimal("60").multiply(BigDecimal.valueOf(5)));
             rentalRepository.save(rental1);
         }
@@ -143,7 +143,7 @@ public class DataInitializer implements CommandLineRunner {
         if (vehicle2 != null && customer2 != null) {
             LocalDate startDate = LocalDate.now().plusDays(3);
             LocalDate endDate = startDate.plusDays(7);
-            Rental rental2 = new Rental(vehicle2, customer2, startDate, endDate, RentalStatus.PENDING);
+            Rental rental2 = new Rental(null, vehicle2, customer2, startDate, endDate, endDate, RentalStatus.PENDING, null, null, endDate);
             rental2.setTotalCost(new BigDecimal("85").multiply(BigDecimal.valueOf(7)));
             rentalRepository.save(rental2);
         }

@@ -1,7 +1,7 @@
 package com.example.VRS.exception;
 
 import com.example.VRS.controller.CustomerController;
-import com.example.VRS.model.ErrorResponse;
+import com.example.VRS.model.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,11 +24,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * Thrown when a resource (Customer, Vehicle, Rental) is not found
      */
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
+    public ResponseEntity<ErrorResponseDto> handleResourceNotFoundException(
             ResourceNotFoundException ex,
             WebRequest request) {
         
-        ErrorResponse errorResponse = new ErrorResponse(
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
                 "Resource Not Found",
@@ -44,11 +44,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * Thrown when rental operation violates business rules
      */
     @ExceptionHandler(InvalidRentalException.class)
-    public ResponseEntity<ErrorResponse> handleInvalidRentalException(
+    public ResponseEntity<ErrorResponseDto> handleInvalidRentalException(
             InvalidRentalException ex,
             WebRequest request) {
         
-        ErrorResponse errorResponse = new ErrorResponse(
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
                 HttpStatus.BAD_REQUEST.value(),
                 ex.getMessage(),
                 "Invalid Rental Operation",
@@ -64,11 +64,11 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * Thrown when trying to create a duplicate resource
      */
     @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicateResourceException(
+    public ResponseEntity<ErrorResponseDto> handleDuplicateResourceException(
             DuplicateResourceException ex,
             WebRequest request) {
         
-        ErrorResponse errorResponse = new ErrorResponse(
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
                 HttpStatus.CONFLICT.value(),
                 ex.getMessage(),
                 "Duplicate Resource",
@@ -84,7 +84,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * Excludes framework exceptions from Swagger/SpringDoc
      */
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleRuntimeException(
+    public ResponseEntity<ErrorResponseDto> handleRuntimeException(
             RuntimeException ex,
             WebRequest request) {
         
@@ -95,7 +95,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             throw ex;
         }
         
-        ErrorResponse errorResponse = new ErrorResponse(
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "An unexpected error occurred. Please try again later.",
                 ex.getClass().getSimpleName(),
@@ -111,7 +111,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
      * Excludes framework exceptions that need to propagate
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGlobalException(
+    public ResponseEntity<ErrorResponseDto> handleGlobalException(
             Exception ex,
             WebRequest request) {
         
@@ -122,7 +122,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             throw new RuntimeException(ex);
         }
         
-        ErrorResponse errorResponse = new ErrorResponse(
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "An unexpected error occurred. Please contact support.",
                 ex.getClass().getSimpleName(),

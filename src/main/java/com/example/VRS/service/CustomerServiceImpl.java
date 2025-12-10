@@ -4,14 +4,16 @@ import com.example.VRS.entity.Customer;
 import com.example.VRS.model.CustomerDto;
 import com.example.VRS.repository.CustomerRepository;
 import com.example.VRS.exception.ResourceNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.VRS.mapper.CustomerMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.CallableStatementCallback;
 import oracle.jdbc.OracleTypes;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,34 +22,38 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerServiceImpl implements CustomerService {
     
-    @Autowired
     private CustomerRepository customerRepository;
     
-    @Autowired
     private JdbcTemplate jdbcTemplate;
+    
+    private CustomerMapper customerMapper;
 
-    @Override
-    public CustomerDto createCustomer(CustomerDto customerDto) {
-        Customer customer = new Customer(
-                customerDto.getFirstName(),
-                customerDto.getLastName(),
-                customerDto.getEmail(),
-                customerDto.getPhoneNumber(),
-                customerDto.getAddress(),
-                customerDto.getCity(),
-                customerDto.getState(),
-                customerDto.getPostalCode(),
-                customerDto.getLicenseNumber(),
-                customerDto.getLicenseExpiry(),
-                customerDto.getDateOfBirth()
-        );
-        
-        Customer savedCustomer = customerRepository.save(customer);
-        return convertToDto(savedCustomer);
+    public CustomerServiceImpl(CustomerRepository customerRepository,JdbcTemplate jdbcTemplate,CustomerMapper customerMapper){
+        this.customerRepository = customerRepository;
+        this.customerMapper = customerMapper;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public List<CustomerDto> getAllCustomers() {
+    public CustomerDto createCustomer(CustomerDto customerDto) {
+        Customer customer = customerMapper.toEntity(customerDto);
+        Customer savedCustomer = customerRepository.save(customer);
+        return customerMapper.toDto(savedCustomer);
+    }
+
+    @Override
+    public Page<CustomerDto> getAllCustomers(Pageable pageable) {
+        // Use JPA pagination directly - let exceptions bubble up for proper error handling
+        Page<Customer> customerPage = customerRepository.findAll(pageable);
+        List<CustomerDto> customerDtos = customerPage.getContent().stream()
+                .map(customerMapper::toDto)
+                .collect(Collectors.toList());
+        
+        return new PageImpl<>(customerDtos, pageable, customerPage.getTotalElements());
+    }
+    
+    @Override
+    public List<CustomerDto> getAllCustomersNoPagination() {
         try {
             // Call stored procedure using JdbcTemplate
             return getAllCustomersFromProcedure();
@@ -55,7 +61,7 @@ public class CustomerServiceImpl implements CustomerService {
             System.err.println("Error calling stored procedure: " + e.getMessage());
             // Fallback to regular JPA if procedure fails
             return customerRepository.findAll().stream()
-                    .map(this::convertToDto)
+                    .map(customerMapper::toDto)
                     .collect(Collectors.toList());
         }
     }
@@ -74,7 +80,7 @@ public class CustomerServiceImpl implements CustomerService {
                 List<CustomerDto> customers = new ArrayList<>();
                 try (ResultSet rs = (ResultSet) callableStatement.getObject(1)) {
                     while (rs.next()) {
-                        CustomerDto customerDto = mapResultSetToDto(rs);
+                        CustomerDto customerDto = customerMapper.mapResultSetToDto(rs);
                         customers.add(customerDto);
                     }
                 }
@@ -83,29 +89,12 @@ public class CustomerServiceImpl implements CustomerService {
             }
         );
     }
-    
-    private CustomerDto mapResultSetToDto(ResultSet rs) throws SQLException {
-        return new CustomerDto(
-            rs.getLong("ID"),
-            rs.getString("FIRST_NAME"),
-            rs.getString("LAST_NAME"),
-            rs.getString("EMAIL"),
-            rs.getString("PHONE_NUMBER"),
-            rs.getString("ADDRESS"),
-            rs.getString("CITY"),
-            rs.getString("STATE"),
-            rs.getString("POSTAL_CODE"),
-            rs.getString("LICENSE_NUMBER"),
-            rs.getDate("LICENSE_EXPIRY") != null ? rs.getDate("LICENSE_EXPIRY").toLocalDate() : null,
-            rs.getDate("DATE_OF_BIRTH") != null ? rs.getDate("DATE_OF_BIRTH").toLocalDate() : null,
-            rs.getDate("REGISTRATION_DATE") != null ? rs.getDate("REGISTRATION_DATE").toLocalDate() : null
-        );
-    }
+
 
     @Override
     public Optional<CustomerDto> getCustomerById(Long customerId) {
         return customerRepository.findById(customerId)
-                .map(this::convertToDto);
+                .map(customerMapper::toDto);
     }
 
     @Override
@@ -113,20 +102,10 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with ID: " + customerId));
         
-        customer.setFirstName(customerDto.getFirstName());
-        customer.setLastName(customerDto.getLastName());
-        customer.setEmail(customerDto.getEmail());
-        customer.setPhoneNumber(customerDto.getPhoneNumber());
-        customer.setAddress(customerDto.getAddress());
-        customer.setCity(customerDto.getCity());
-        customer.setState(customerDto.getState());
-        customer.setPostalCode(customerDto.getPostalCode());
-        customer.setLicenseNumber(customerDto.getLicenseNumber());
-        customer.setLicenseExpiry(customerDto.getLicenseExpiry());
-        customer.setDateOfBirth(customerDto.getDateOfBirth());
+        customerMapper.updateEntityFromDto(customerDto, customer);
         
         Customer updatedCustomer = customerRepository.save(customer);
-        return convertToDto(updatedCustomer);
+        return customerMapper.toDto(updatedCustomer);
     }
 
     @Override
@@ -134,22 +113,5 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.deleteById(customerId);
     }
 
-    private CustomerDto convertToDto(Customer customer) {
-        return new CustomerDto(
-                customer.getId(),
-                customer.getFirstName(),
-                customer.getLastName(),
-                customer.getEmail(),
-                customer.getPhoneNumber(),
-                customer.getAddress(),
-                customer.getCity(),
-                customer.getState(),
-                customer.getPostalCode(),
-                customer.getLicenseNumber(),
-                customer.getLicenseExpiry(),
-                customer.getDateOfBirth(),
-                customer.getRegistrationDate()
-        );
-    }
-
 }
+
