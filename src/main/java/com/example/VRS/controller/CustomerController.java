@@ -34,7 +34,6 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.OK).body(customers);
     }
     
-    // Keep the original method for backward compatibility
     @GetMapping("/get/all")
     public ResponseEntity<List<CustomerDto>> getAllCustomersNoPagination() {
         List<CustomerDto> customers = customerService.getAllCustomersNoPagination();
