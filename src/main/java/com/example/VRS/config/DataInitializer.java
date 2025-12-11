@@ -9,7 +9,6 @@ import com.example.VRS.enums.RentalStatus;
 import com.example.VRS.repository.VehicleRepository;
 import com.example.VRS.repository.CustomerRepository;
 import com.example.VRS.repository.RentalRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -19,14 +18,15 @@ import java.time.LocalDate;
 @Component
 public class DataInitializer implements CommandLineRunner {
     
-    @Autowired
-    private VehicleRepository vehicleRepository;
-    
-    @Autowired
+    private VehicleRepository vehicleRepository;    
     private CustomerRepository customerRepository;
-    
-    @Autowired
     private RentalRepository rentalRepository;
+
+    public DataInitializer(VehicleRepository vehicleRepository,CustomerRepository customerRepository,RentalRepository rentalRepository){
+        this.vehicleRepository = vehicleRepository;
+        this.customerRepository = customerRepository;
+        this.rentalRepository = rentalRepository;
+    }
     
     @Override
     public void run(String... args) throws Exception {

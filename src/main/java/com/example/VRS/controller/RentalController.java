@@ -29,7 +29,7 @@ public class RentalController {
     @GetMapping
     public ResponseEntity<List<RentalDto>> getAllRentals() {
         List<RentalDto> rentals = rentalService.getAllRentals();
-        return ResponseEntity.ok(rentals);
+        return ResponseEntity.status(HttpStatus.OK).body(rentals);
     }
     
     @GetMapping("/{id}")
@@ -44,10 +44,9 @@ public class RentalController {
             @PathVariable Long id,
             @RequestBody RentalDto rentalDto) {
         RentalDto updatedRental = rentalService.updateRental(id, rentalDto);
-        return ResponseEntity.ok(updatedRental);
+        return ResponseEntity.status(HttpStatus.OK).body(updatedRental);
     }
     
-    // Update rental status
     @PatchMapping("/{id}/status")
     public ResponseEntity<RentalDto> updateRentalStatus(
             @PathVariable Long id,

@@ -1,0 +1,687 @@
+openapi: 3.1.0
+info:
+  title: Vehicle Rental System API
+  description: API for managing vehicle rentals, customers, and vehicles
+  version: 1.0.0
+  contact:
+    name: Vehicle Rental System
+    email: support@vrs.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+
+paths:
+  # Customer endpoints
+  /api/customers/create:
+    post:
+      tags:
+        - Customers
+      summary: Create a new customer
+      description: Creates a new customer in the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerDto'
+      responses:
+        '201':
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDto'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+
+  /api/customers/get:
+    get:
+      tags:
+        - Customers
+      summary: Get all customers with pagination
+      description: Retrieves all customers with pagination support
+      parameters:
+        - name: page
+          in: query
+          description: Page number (0-based)
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: Page size
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: sort
+          in: query
+          description: Sort criteria (field,direction)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customers retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CustomerDto'
+                  pageable:
+                    type: object
+                  totalElements:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  last:
+                    type: boolean
+                  first:
+                    type: boolean
+                  number:
+                    type: integer
+                  size:
+                    type: integer
+
+  /api/customers/get/all:
+    get:
+      tags:
+        - Customers
+      summary: Get all customers without pagination
+      description: Retrieves all customers without pagination
+      responses:
+        '200':
+          description: All customers retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomerDto'
+
+  /api/customers/get/{id}:
+    get:
+      tags:
+        - Customers
+      summary: Get customer by ID
+      description: Retrieves a specific customer by their ID
+      parameters:
+        - name: id
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Customer found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDto'
+        '404':
+          description: Customer not found
+
+  /api/customers/update/{id}:
+    put:
+      tags:
+        - Customers
+      summary: Update customer
+      description: Updates an existing customer
+      parameters:
+        - name: id
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerDto'
+      responses:
+        '200':
+          description: Customer updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerDto'
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+
+  /api/customers/delete/{id}:
+    delete:
+      tags:
+        - Customers
+      summary: Delete customer
+      description: Deletes a customer from the system
+      parameters:
+        - name: id
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Customer deleted successfully
+        '404':
+          description: Customer not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+
+  # Vehicle endpoints
+  /api/vehicles:
+    get:
+      tags:
+        - Vehicles
+      summary: Get all vehicles
+      description: Retrieves all vehicles in the system
+      responses:
+        '200':
+          description: Vehicles retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VehicleDto'
+    post:
+      tags:
+        - Vehicles
+      summary: Create a new vehicle
+      description: Creates a new vehicle in the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleDto'
+      responses:
+        '201':
+          description: Vehicle created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleDto'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+
+  /api/vehicles/search:
+    get:
+      tags:
+        - Vehicles
+      summary: Search vehicles
+      description: Search vehicles by type and maximum price
+      parameters:
+        - name: type
+          in: query
+          description: Vehicle type
+          required: true
+          schema:
+            $ref: '#/components/schemas/VehicleType'
+        - name: maxPrice
+          in: query
+          description: Maximum daily rate
+          required: true
+          schema:
+            type: number
+            format: decimal
+      responses:
+        '200':
+          description: Vehicles found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VehicleDto'
+
+  /api/vehicles/{id}:
+    get:
+      tags:
+        - Vehicles
+      summary: Get vehicle by ID
+      description: Retrieves a specific vehicle by its ID
+      parameters:
+        - name: id
+          in: path
+          description: Vehicle ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Vehicle found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleDto'
+        '404':
+          description: Vehicle not found
+    put:
+      tags:
+        - Vehicles
+      summary: Update vehicle
+      description: Updates an existing vehicle
+      parameters:
+        - name: id
+          in: path
+          description: Vehicle ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleDto'
+      responses:
+        '200':
+          description: Vehicle updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VehicleDto'
+        '404':
+          description: Vehicle not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    delete:
+      tags:
+        - Vehicles
+      summary: Delete vehicle
+      description: Deletes a vehicle from the system
+      parameters:
+        - name: id
+          in: path
+          description: Vehicle ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Vehicle deleted successfully
+        '404':
+          description: Vehicle not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+
+  # Rental endpoints
+  /api/rentals:
+    get:
+      tags:
+        - Rentals
+      summary: Get all rentals
+      description: Retrieves all rentals in the system
+      responses:
+        '200':
+          description: Rentals retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RentalDto'
+    post:
+      tags:
+        - Rentals
+      summary: Create a new rental
+      description: Creates a new rental in the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalDto'
+      responses:
+        '201':
+          description: Rental created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalDto'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+
+  /api/rentals/{id}:
+    get:
+      tags:
+        - Rentals
+      summary: Get rental by ID
+      description: Retrieves a specific rental by its ID
+      parameters:
+        - name: id
+          in: path
+          description: Rental ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Rental found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalDto'
+        '404':
+          description: Rental not found
+    put:
+      tags:
+        - Rentals
+      summary: Update rental
+      description: Updates an existing rental
+      parameters:
+        - name: id
+          in: path
+          description: Rental ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentalDto'
+      responses:
+        '200':
+          description: Rental updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalDto'
+        '404':
+          description: Rental not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+    delete:
+      tags:
+        - Rentals
+      summary: Delete rental
+      description: Deletes a rental from the system
+      parameters:
+        - name: id
+          in: path
+          description: Rental ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Rental deleted successfully
+        '404':
+          description: Rental not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+
+  /api/rentals/{id}/status:
+    patch:
+      tags:
+        - Rentals
+      summary: Update rental status
+      description: Updates the status of an existing rental
+      parameters:
+        - name: id
+          in: path
+          description: Rental ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [PENDING, ACTIVE, COMPLETED, CANCELLED]
+              required:
+                - status
+      responses:
+        '200':
+          description: Rental status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RentalDto'
+        '404':
+          description: Rental not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+
+components:
+  schemas:
+    CustomerDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Customer ID
+        firstName:
+          type: string
+          description: Customer's first name
+        lastName:
+          type: string
+          description: Customer's last name
+        email:
+          type: string
+          format: email
+          description: Customer's email address
+        phoneNumber:
+          type: string
+          description: Customer's phone number
+        address:
+          type: string
+          description: Customer's street address
+        city:
+          type: string
+          description: Customer's city
+        state:
+          type: string
+          description: Customer's state
+        postalCode:
+          type: string
+          description: Customer's postal code
+        licenseNumber:
+          type: string
+          description: Customer's driving license number
+        licenseExpiry:
+          type: string
+          format: date
+          description: Driving license expiry date
+        dateOfBirth:
+          type: string
+          format: date
+          description: Customer's date of birth
+        registrationDate:
+          type: string
+          format: date
+          description: Customer registration date
+
+    VehicleDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Vehicle ID
+        registrationNumber:
+          type: string
+          description: Vehicle registration number
+        brand:
+          type: string
+          description: Vehicle brand
+        model:
+          type: string
+          description: Vehicle model
+        color:
+          type: string
+          description: Vehicle color
+        year:
+          type: integer
+          description: Vehicle manufacturing year
+        seatingCapacity:
+          type: integer
+          description: Vehicle seating capacity
+        dailyRate:
+          type: number
+          format: decimal
+          description: Daily rental rate
+        type:
+          $ref: '#/components/schemas/VehicleType'
+        status:
+          $ref: '#/components/schemas/VehicleStatus'
+
+    RentalDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Rental ID
+        vehicleId:
+          type: integer
+          format: int64
+          description: ID of the rented vehicle
+        vehicleDetails:
+          type: string
+          description: Details of the rented vehicle
+        customerId:
+          type: integer
+          format: int64
+          description: ID of the customer
+        customerName:
+          type: string
+          description: Name of the customer
+        startDate:
+          type: string
+          format: date
+          description: Rental start date
+        endDate:
+          type: string
+          format: date
+          description: Rental end date
+        actualReturnDate:
+          type: string
+          format: date
+          description: Actual return date
+        status:
+          $ref: '#/components/schemas/RentalStatus'
+        totalCost:
+          type: number
+          format: decimal
+          description: Total rental cost
+        notes:
+          type: string
+          description: Additional notes
+
+    ErrorResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          description: HTTP status code
+        message:
+          type: string
+          description: Error message
+        error:
+          type: string
+          description: Error type
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp of the error
+        path:
+          type: string
+          description: Request path that caused the error
+
+    VehicleType:
+      type: string
+      enum:
+        - SEDAN
+        - SUV
+        - HATCHBACK
+        - LUXURY
+        - VAN
+        - MOTORCYCLE
+      description: Type of vehicle
+
+    VehicleStatus:
+      type: string
+      enum:
+        - AVAILABLE
+        - RENTED
+        - MAINTENANCE
+        - RETIRED
+      description: Current status of the vehicle
+
+    RentalStatus:
+      type: string
+      enum:
+        - PENDING
+        - ACTIVE
+        - COMPLETED
+        - CANCELLED
+      description: Current status of the rental
+
+tags:
+  - name: Customers
+    description: Operations related to customer management
+  - name: Vehicles
+    description: Operations related to vehicle management
+  - name: Rentals
+    description: Operations related to rental management
