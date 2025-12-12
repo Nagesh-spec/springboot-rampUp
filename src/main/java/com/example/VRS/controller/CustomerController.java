@@ -15,39 +15,39 @@ import java.util.List;
 @RequestMapping("/api/customers")
 public class CustomerController {
     
-    private CustomerService customerService;
+    private final CustomerService customerService;
     
     public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
     }
     
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<CustomerDto> createCustomer(@RequestBody CustomerDto customerDto) {
         CustomerDto createdCustomer = customerService.createCustomer(customerDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCustomer);
     }
     
-    @GetMapping("/get")
+    @GetMapping
     public ResponseEntity<Page<CustomerDto>> getAllCustomers(
             @PageableDefault(size = 10) Pageable pageable) {
         Page<CustomerDto> customers = customerService.getAllCustomers(pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(customers);
+        return ResponseEntity.ok(customers);
     }
     
-    @GetMapping("/get/all")
+    @GetMapping("/all")
     public ResponseEntity<List<CustomerDto>> getAllCustomersNoPagination() {
         List<CustomerDto> customers = customerService.getAllCustomersNoPagination();
-        return ResponseEntity.status(HttpStatus.OK).body(customers);
+        return ResponseEntity.ok(customers);
     }
     
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<CustomerDto> getCustomerById(@PathVariable Long id) {
         return customerService.getCustomerById(id)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
     
-    @PutMapping("update/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<CustomerDto> updateCustomer(
             @PathVariable Long id,
             @RequestBody CustomerDto customerDto) {
@@ -55,10 +55,9 @@ public class CustomerController {
         return ResponseEntity.ok(updatedCustomer);
     }
     
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
         customerService.deleteCustomer(id);
         return ResponseEntity.noContent().build();
     }
-    
 }

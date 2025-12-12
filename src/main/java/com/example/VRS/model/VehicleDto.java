@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class VehicleDto{
+public class VehicleDto {
     private Long id;
     private String registrationNumber;
-    private String brand;
+    private String make;
     private String model;
     private String color;
     private Integer year;

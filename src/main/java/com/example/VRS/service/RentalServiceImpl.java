@@ -22,13 +22,11 @@ import java.util.stream.Collectors;
 @Service
 public class RentalServiceImpl implements RentalService {
     
-    private RentalRepository rentalRepository;
-    
-    private VehicleRepository vehicleRepository;
-    
-    private CustomerRepository customerRepository;
+    private final RentalRepository rentalRepository;
+    private final VehicleRepository vehicleRepository;
+    private final CustomerRepository customerRepository;
 
-    public RentalServiceImpl(RentalRepository rentalRepository,VehicleRepository vehicleRepository,CustomerRepository customerRepository){
+    public RentalServiceImpl(RentalRepository rentalRepository, VehicleRepository vehicleRepository, CustomerRepository customerRepository) {
         this.rentalRepository = rentalRepository;
         this.vehicleRepository = vehicleRepository;
         this.customerRepository = customerRepository;

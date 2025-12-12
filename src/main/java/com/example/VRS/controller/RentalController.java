@@ -14,7 +14,7 @@ import java.util.Map;
 @RequestMapping("/api/rentals")
 public class RentalController {
     
-    private RentalService rentalService;
+    private final RentalService rentalService;
 
     public RentalController(RentalService rentalService) {
         this.rentalService = rentalService;

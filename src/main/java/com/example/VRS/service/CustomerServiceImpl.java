@@ -22,13 +22,11 @@ import java.util.stream.Collectors;
 @Service
 public class CustomerServiceImpl implements CustomerService {
     
-    private CustomerRepository customerRepository;
-    
-    private JdbcTemplate jdbcTemplate;
-    
-    private CustomerMapper customerMapper;
+    private final CustomerRepository customerRepository;
+    private final JdbcTemplate jdbcTemplate;
+    private final CustomerMapper customerMapper;
 
-    public CustomerServiceImpl(CustomerRepository customerRepository,JdbcTemplate jdbcTemplate,CustomerMapper customerMapper){
+    public CustomerServiceImpl(CustomerRepository customerRepository, JdbcTemplate jdbcTemplate, CustomerMapper customerMapper) {
         this.customerRepository = customerRepository;
         this.customerMapper = customerMapper;
         this.jdbcTemplate = jdbcTemplate;

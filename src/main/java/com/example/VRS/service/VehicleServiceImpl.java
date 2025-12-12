@@ -27,7 +27,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleDto createVehicle(VehicleDto vehicleDto) {
         Vehicle vehicle = new Vehicle(null, null, null, null, null, null, null, null, null, null, null);
-        vehicle.setMake(vehicleDto.getBrand());
+        vehicle.setMake(vehicleDto.getMake());
         vehicle.setModel(vehicleDto.getModel());
         vehicle.setColor(vehicleDto.getColor());
         vehicle.setYear(vehicleDto.getYear());
@@ -59,7 +59,7 @@ public class VehicleServiceImpl implements VehicleService {
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with ID: " + vehicleId));
         
-        vehicle.setMake(vehicleDto.getBrand());
+        vehicle.setMake(vehicleDto.getMake());
         vehicle.setModel(vehicleDto.getModel());
         vehicle.setColor(vehicleDto.getColor());
         vehicle.setYear(vehicleDto.getYear());

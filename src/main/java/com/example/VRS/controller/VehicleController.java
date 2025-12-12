@@ -2,7 +2,6 @@ package com.example.VRS.controller;
 
 import com.example.VRS.model.VehicleDto;
 import com.example.VRS.enums.VehicleType;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +17,7 @@ public class VehicleController {
 
     private final VehicleService vehicleService;
 
-    public VehicleController(@Qualifier("vehicleService") VehicleService vehicleService) {
+    public VehicleController(VehicleService vehicleService) {
         this.vehicleService = vehicleService;
     }
 
