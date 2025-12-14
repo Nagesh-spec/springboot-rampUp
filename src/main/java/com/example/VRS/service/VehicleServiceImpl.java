@@ -6,6 +6,8 @@ import com.example.VRS.model.VehicleDto;
 import com.example.VRS.repository.VehicleRepository;
 import com.example.VRS.exception.ResourceNotFoundException;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
+    @CacheEvict(value = "vehicles", allEntries = true)
     public VehicleDto createVehicle(VehicleDto vehicleDto) {
         Vehicle vehicle = new Vehicle(null, null, null, null, null, null, null, null, null, null, null);
         vehicle.setMake(vehicleDto.getMake());
@@ -42,6 +45,7 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
+    @Cacheable(value = "vehicles")
     public List<VehicleDto> getAllVehicles() {
         return vehicleRepository.findAll().stream()
                 .map(this::convertToDto)
@@ -55,6 +59,7 @@ public class VehicleServiceImpl implements VehicleService {
     }
 
     @Override
+    @CacheEvict(value = "vehicles", allEntries = true)
     public VehicleDto updateVehicle(Long vehicleId, VehicleDto vehicleDto) {
         Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with ID: " + vehicleId));
@@ -74,10 +79,12 @@ public class VehicleServiceImpl implements VehicleService {
 
 
     @Override
+    @CacheEvict(value = "vehicles", allEntries = true)
     public void deleteVehicle(Long vehicleId) {
         vehicleRepository.deleteById(vehicleId);
     }
 
+    @Cacheable(value = "vehicles", key = "'available'")
     public List<VehicleDto> getAvailableVehicles() {
         return vehicleRepository.findAllAvailableVehicles().stream()
                 .map(this::convertToDto)

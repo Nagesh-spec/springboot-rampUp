@@ -5,6 +5,8 @@ import com.example.VRS.model.CustomerDto;
 import com.example.VRS.repository.CustomerRepository;
 import com.example.VRS.exception.ResourceNotFoundException;
 import com.example.VRS.mapper.CustomerMapper;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +35,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @CacheEvict(value = "customers", allEntries = true)
     public CustomerDto createCustomer(CustomerDto customerDto) {
         Customer customer = customerMapper.toEntity(customerDto);
         Customer savedCustomer = customerRepository.save(customer);
@@ -40,6 +43,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Cacheable(value = "customers", key = "#pageable.pageNumber + '_' + #pageable.pageSize")
     public Page<CustomerDto> getAllCustomers(Pageable pageable) {
         // Use JPA pagination directly - let exceptions bubble up for proper error handling
         Page<Customer> customerPage = customerRepository.findAll(pageable);
@@ -96,6 +100,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @CacheEvict(value = "customers", allEntries = true)
     public CustomerDto updateCustomer(Long customerId, CustomerDto customerDto) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Customer not found with ID: " + customerId));
@@ -107,6 +112,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @CacheEvict(value = "customers", allEntries = true)
     public void deleteCustomer(Long customerId) {
         customerRepository.deleteById(customerId);
     }

@@ -1,11 +1,12 @@
 package com.example.VRS.controller;
 
-import com.example.VRS.config.JwtUtils;
 import com.example.VRS.entity.User;
 import com.example.VRS.model.AuthResponse;
 import com.example.VRS.model.LoginRequest;
 import com.example.VRS.model.RegisterRequest;
 import com.example.VRS.service.UserService;
+import com.example.VRS.utils.JwtUtils;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

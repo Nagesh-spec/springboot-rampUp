@@ -1,4 +1,4 @@
-package com.example.VRS.config;
+package com.example.VRS.utils;
 
 import com.example.VRS.service.UserService;
 import jakarta.servlet.FilterChain;

@@ -11,6 +11,8 @@ import com.example.VRS.repository.VehicleRepository;
 import com.example.VRS.repository.CustomerRepository;
 import com.example.VRS.exception.ResourceNotFoundException;
 import com.example.VRS.exception.InvalidRentalException;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -33,6 +35,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @CacheEvict(value = {"rentals", "vehicles"}, allEntries = true)
     public RentalDto createRental(RentalDto rentalDto) {
         Vehicle vehicle = vehicleRepository.findById(rentalDto.getVehicleId())
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found with ID: " + rentalDto.getVehicleId()));
@@ -61,6 +64,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @Cacheable(value = "rentals")
     public List<RentalDto> getAllRentals() {
         return rentalRepository.findAll().stream()
                 .map(this::convertToDto)
@@ -74,6 +78,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @CacheEvict(value = {"rentals", "vehicles"}, allEntries = true)
     public RentalDto updateRental(Long rentalId, RentalDto rentalDto) {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Rental not found with ID: " + rentalId));
@@ -108,6 +113,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @CacheEvict(value = {"rentals", "vehicles"}, allEntries = true)
     public RentalDto updateRentalStatus(Long rentalId, RentalStatus status) {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Rental not found with ID: " + rentalId));
@@ -119,6 +125,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @CacheEvict(value = "rentals", allEntries = true)
     public RentalDto updateRentalDates(Long rentalId, LocalDate startDate, LocalDate endDate) {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Rental not found with ID: " + rentalId));
@@ -138,6 +145,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @CacheEvict(value = {"rentals", "vehicles"}, allEntries = true)
     public RentalDto completeRental(Long rentalId, LocalDate actualReturnDate) {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Rental not found with ID: " + rentalId));
@@ -155,6 +163,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @CacheEvict(value = "rentals", allEntries = true)
     public RentalDto updateRentalNotes(Long rentalId, String notes) {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Rental not found with ID: " + rentalId));
@@ -166,6 +175,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @CacheEvict(value = "rentals", allEntries = true)
     public RentalDto updateRentalCost(Long rentalId, BigDecimal totalCost) {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Rental not found with ID: " + rentalId));
@@ -229,6 +239,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @CacheEvict(value = {"rentals", "vehicles"}, allEntries = true)
     public void deleteRental(Long rentalId) {
         Rental rental = rentalRepository.findById(rentalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Rental not found with ID: " + rentalId));

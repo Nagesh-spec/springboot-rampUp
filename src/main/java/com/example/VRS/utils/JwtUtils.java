@@ -1,4 +1,4 @@
-package com.example.VRS.config;
+package com.example.VRS.utils;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
