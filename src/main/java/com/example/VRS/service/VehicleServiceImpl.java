@@ -1,6 +1,7 @@
 package com.example.VRS.service;
 
 import com.example.VRS.entity.Vehicle;
+import com.example.VRS.enums.VehicleStatus;
 import com.example.VRS.enums.VehicleType;
 import com.example.VRS.model.VehicleDto;
 import com.example.VRS.repository.VehicleRepository;
@@ -96,6 +97,21 @@ public class VehicleServiceImpl implements VehicleService {
         return vehicleRepository.searchVehicles(type, maxPrice).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public long getTotalVehicleCount() {
+        return vehicleRepository.count();
+    }
+
+    @Override
+    public long getAvailableVehicleCount() {
+        return vehicleRepository.findAllAvailableVehicles().size();
+    }
+
+    @Override
+    public long getRentedVehicleCount() {
+        return vehicleRepository.findByStatus(VehicleStatus.RENTED).size();
     }
 
     private VehicleDto convertToDto(Vehicle vehicle) {

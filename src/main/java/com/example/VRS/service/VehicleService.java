@@ -19,5 +19,12 @@ public interface VehicleService {
     void deleteVehicle(Long vehicleId);
     
     List<VehicleDto> searchVehicles(VehicleType type, BigDecimal maxPrice);
+    
+    // Monitoring methods for scheduled tasks
+    long getTotalVehicleCount();
+    
+    long getAvailableVehicleCount();
+    
+    long getRentedVehicleCount();
 
 }

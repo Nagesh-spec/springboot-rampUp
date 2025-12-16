@@ -1,9 +1,11 @@
 package com.example.VRS.exception;
 
-import com.example.VRS.controller.CustomerController;
 import com.example.VRS.model.ErrorResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -15,9 +17,65 @@ import java.time.LocalDateTime;
  * Global exception handler for the entire application
  * Provides consistent error responses across all endpoints
  */
-
-@RestControllerAdvice(assignableTypes = {CustomerController.class})
+@RestControllerAdvice // Removed assignableTypes to handle ALL controllers
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    /**
+     * Handles authentication exceptions (invalid credentials, expired tokens, etc.)
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponseDto> handleAuthenticationException(
+            AuthenticationException ex,
+            WebRequest request) {
+        
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Authentication failed. Please check your credentials.",
+                "Authentication Error",
+                LocalDateTime.now(),
+                request.getDescription(false).replace("uri=", "")
+        );
+        
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * Handles bad credentials specifically
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponseDto> handleBadCredentialsException(
+            BadCredentialsException ex,
+            WebRequest request) {
+        
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Invalid username or password.",
+                "Bad Credentials",
+                LocalDateTime.now(),
+                request.getDescription(false).replace("uri=", "")
+        );
+        
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * Handles access denied exceptions (insufficient permissions)
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponseDto> handleAccessDeniedException(
+            AccessDeniedException ex,
+            WebRequest request) {
+        
+        ErrorResponseDto errorResponse = new ErrorResponseDto(
+                HttpStatus.FORBIDDEN.value(),
+                "Access denied. You don't have permission to access this resource.",
+                "Access Denied",
+                LocalDateTime.now(),
+                request.getDescription(false).replace("uri=", "")
+        );
+        
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
 
     /**
      * Handles ResourceNotFoundException
