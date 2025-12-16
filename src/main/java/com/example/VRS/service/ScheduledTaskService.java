@@ -62,46 +62,34 @@ public class ScheduledTaskService {
         lockAtLeastFor = "1s"
     )
     public void vehicleStatusMonitoring() {
-        long startTime = System.currentTimeMillis();
-        String taskName = "Vehicle Status Monitoring";
         
         try {
-            log.info("Starting vehicle status monitoring task");
-            loggerService.logSystemEvent("MONITORING_TASK_STARTED", taskName);
+            System.out.println("***************EVERY 3 SEC*****************");
             
             // Get vehicle statistics
             long totalVehicles = vehicleService.getTotalVehicleCount();
             long availableVehicles = vehicleService.getAvailableVehicleCount();
             long rentedVehicles = vehicleService.getRentedVehicleCount();
             
-            // Log vehicle statistics
-            loggerService.logInfo(String.format(
-                "Vehicle Statistics - Total: %d, Available: %d, Rented: %d",
-                totalVehicles, availableVehicles, rentedVehicles
-            ));
+            // Display only vehicle data
+            System.out.println("Vehicle Statistics:");
+            System.out.println("  Total: " + totalVehicles);
+            System.out.println("  Available: " + availableVehicles);
+            System.out.println("  Rented: " + rentedVehicles);
             
-            // Log system health metrics
             double availabilityRate = totalVehicles > 0 ? 
                 (double) availableVehicles / totalVehicles * 100 : 0;
             
-            loggerService.logInfo(String.format(
-                "System Health - Vehicle Availability Rate: %.2f%%", 
-                availabilityRate
-            ));
+            System.out.println("  Availability Rate: " + String.format("%.2f%%", availabilityRate));
             
-            // Alert if availability is low
             if (availabilityRate < 20.0) {
-                loggerService.logWarning(
-                    "Low vehicle availability detected: " + availabilityRate + "%"
-                );
+                System.out.println("  WARNING: Low vehicle availability!");
             }
             
-            long executionTime = System.currentTimeMillis() - startTime;
-            loggerService.logOperationTime(taskName, executionTime);
-            loggerService.logSystemEvent("MONITORING_TASK_COMPLETED", taskName);
+            System.out.println("***************END*****************");
             
         } catch (Exception e) {
-            loggerService.logError("Error in vehicle monitoring task", e);
+            System.out.println("Error in vehicle monitoring: " + e.getMessage());
         }
     }
 
